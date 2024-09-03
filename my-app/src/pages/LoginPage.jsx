@@ -6,24 +6,36 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const navigate = useNavigate(); 
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Проверка на наличие пользователей
-    const users = JSON.parse(localStorage.getItem('users')) || [];
-    const user = users.find(user => user.email === email && user.password === password);
+    try {
+        // запрос параметров на вход
+        const url = new URL('https://123.com/login'); // эндпоинт
+        url.searchParams.append('email', email);
+        url.searchParams.append('password', password);
 
-    if (!user) {
-      setError('Неверный email или пароль');
-      return;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Неверный email или пароль'); // обработка ошибок
+        }
+
+        const user = await response.json();
+        console.log('Успешный вход:', user);
+        navigate('/main'); // успешный вход
+    } catch (error) {
+        setError(error.message);
     }
+};
 
-    // Если вход успешен, перенаправляем пользователя на главную страницу
-    console.log('Успешный вход:', user);
-    navigate('/main'); // Redirect to the main information page
-  };
 
   return (
     <div>

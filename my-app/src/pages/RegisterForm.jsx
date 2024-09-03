@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import './registerForm.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function RegisterForm() {
-  const [id, setId] = useState(0); // Начальное значение ID
+  const [id, setId] = useState(0);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // Состояние для показа пароля
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate
 
-  // Используем useEffect для загрузки последнего ID из localStorage
   useEffect(() => {
     const storedId = localStorage.getItem('lastUserId');
     if (storedId) {
-      setId(Number(storedId)); // Устанавливаем ID из localStorage
+      setId(Number(storedId));
     }
   }, []);
 
@@ -32,7 +32,6 @@ function RegisterForm() {
       return;
     }
 
-    // Проверка на уникальность электронной почты
     const users = JSON.parse(localStorage.getItem('users')) || [];
     const emailExists = users.some(user => user.email === email);
     if (emailExists) {
@@ -41,20 +40,14 @@ function RegisterForm() {
     }
 
     setError('');
-    const newId = id + 1; // Увеличиваем ID на единицу
+    const newId = id + 1;
     console.log('Регистрация:', { id: newId, username, password, email });
 
-    // Сохраняем нового пользователя в localStorage
     users.push({ id: newId, username, password, email });
     localStorage.setItem('users', JSON.stringify(users));
-
-    // Сохраняем новый ID в localStorage
     localStorage.setItem('lastUserId', newId);
-
-    // Обновляем состояние ID
     setId(newId);
 
-    // Отправка данных на сервер (пример)
     try {
       const response = await fetch("https://123.com", {
         method: "POST",
@@ -70,7 +63,10 @@ function RegisterForm() {
 
       const data = await response.json();
       console.log('Ответ сервера:', data);
-      // Здесь вы можете добавить логику для обработки успешной регистрации
+      
+      
+      navigate('/home'); 
+
     } catch (error) {
       console.error('Ошибка:', error);
       setError('Не удалось зарегистрироваться. Попробуйте еще раз.');
@@ -96,7 +92,7 @@ function RegisterForm() {
         <label>
           <input
             className="Password"
-            type={showPassword ? 'text' : 'password'} // Изменение типа в зависимости от состояния
+            type={showPassword ? 'text' : 'password'}
             value={password}
             placeholder="Пароль"
             onChange={(e) => setPassword(e.target.value)}
@@ -116,7 +112,7 @@ function RegisterForm() {
         <label>
           <input
             className="ConfirmPassword"
-            type={showPassword ? 'text' : 'password'} // Изменение типа в зависимости от состояния
+            type={showPassword ? 'text' : 'password'}
             value={confirmPassword}
             placeholder="Подтверждение пароля"
             onChange={(e) => setConfirmPassword(e.target.value)}
